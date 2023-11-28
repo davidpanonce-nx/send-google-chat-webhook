@@ -156,8 +156,6 @@ func realMain(ctx context.Context) error {
 }
 
 func generateMessageBody(ghJson map[string]any, jobJson map[string]any, timestamp time.Time) ([]byte, error) {
-    timezoneLoc, _ := time.LoadLocation("America/Los_Angeles")
-
     jsonData := map[string]any{
         "cardsV2": map[string]any{
             "cardId": "createCardMessage",
