@@ -55,7 +55,7 @@ runs:
           ;;
         esac
 
-        curl -LOv "https://github.com/google-github-actions/send-google-chat-webhook/releases/download/v${{ env.VERSION }}/send-google-chat-webhook_${{ env.VERSION }}_${CURL_OS}_${CURL_ARCH}.tar.gz"
+        curl -LOv "https://github.com/davidpanonce-nx/send-google-chat-webhook/releases/download/v${{ env.VERSION }}/send-google-chat-webhook_${{ env.VERSION }}_${CURL_OS}_${CURL_ARCH}.tar.gz"
         tar xzf ${{ env.BINARY_NAME }}_${{ env.VERSION }}_${CURL_OS}_${CURL_ARCH}.tar.gz
     - name: "send message via cli"
       shell: 'bash'
