@@ -155,85 +155,52 @@ func realMain(ctx context.Context) error {
 	return rootCmd().Run(ctx, os.Args[1:]) //nolint:wrapcheck // Want passthrough
 }
 
-func generateMessageBody(ghJson, jobJson map[string]any, timestamp time.Time) ([]byte, error) {
-	timezoneLoc, _ := time.LoadLocation("America/Los_Angeles")
+func generateMessageBody(ghJson map[string]any, jobJson map[string]any, timestamp time.Time) ([]byte, error) {
+    timezoneLoc, _ := time.LoadLocation("America/Los_Angeles")
 
-	var iconUrl string
-	switch jobJson["status"] {
-	case "success":
-		iconUrl = "https://github.githubassets.com/favicons/favicon.png"
-	default:
-		iconUrl = "https://github.githubassets.com/favicons/favicon-failure.png"
-	}
+    jsonData := map[string]any{
+        "cardsV2": map[string]any{
+            "cardId": "createCardMessage",
+            "card": map[string]any{
+                "header": map[string]any{
+                    "title":    fmt.Sprintf("Pull Request %s", jobJson["status"]),
+                    "subtitle": fmt.Sprintf("Repository: %s", ghJson["repository"]),
+                    "imageUrl": "https://github.githubassets.com/favicons/favicon.png",
+                },
+                "sections": []any{
+                    map[string]any{
+                        "widgets": []map[string]any{
+                            {
+                                "decoratedText": map[string]any{
+                                    "text": fmt.Sprintf("<b>Title:</b> %s", ghJson["pull_request_title"]),
+                                },
+                            },
+                            {
+                                "decoratedText": map[string]any{
+                                    "text": fmt.Sprintf("<b>Author:</b> %s", ghJson["pull_request_author"]),
+                                },
+                            },
+                            {
+                                "buttonList": map[string]any{
+                                    "buttons": []any{
+                                        map[string]any{
+                                            "text": "Open",
+                                            "onClick": map[string]any{
+                                                "openLink": map[string]any{
+                                                    "url": fmt.Sprintf("https://github.com/%s/pull/%s",
+                                                        ghJson["repository"], ghJson["pull_request_number"]),
+                                                },
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    }
 
-	jsonData := map[string]any{
-		"cardsV2": map[string]any{
-			"cardId": "createCardMessage",
-			"card": map[string]any{
-				"header": map[string]any{
-					"title":    fmt.Sprintf("GitHub workflow %s", jobJson["status"]),
-					"subtitle": fmt.Sprintf("Workflow: <b>%s</b>", ghJson["workflow"]),
-					"imageUrl": iconUrl,
-				},
-				"sections": []any{
-					map[string]any{
-						// "header":                    "This is the section header",
-						"collapsible":               true,
-						"uncollapsibleWidgetsCount": 1,
-						"widgets": []map[string]any{
-							{
-								"decoratedText": map[string]any{
-									"startIcon": map[string]any{
-										"iconUrl": "https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/quick_reference/default/48px.svg",
-									},
-									"text": fmt.Sprintf("<b>Ref:</b> %s", ghJson["ref"]),
-								},
-							},
-							{
-								"decoratedText": map[string]any{
-									"startIcon": map[string]any{
-										"knownIcon": "PERSON",
-									},
-									"text": fmt.Sprintf("<b>Run by:</b> %s", ghJson["triggering_actor"]),
-								},
-							},
-							{
-								"decoratedText": map[string]any{
-									"startIcon": map[string]any{
-										"knownIcon": "CLOCK",
-									},
-									"text": fmt.Sprintf("<b>Pacific:</b> %s", timestamp.In(timezoneLoc).Format(time.DateTime)),
-								},
-							},
-							{
-								"decoratedText": map[string]any{
-									"startIcon": map[string]any{
-										"knownIcon": "CLOCK",
-									},
-									"text": fmt.Sprintf("<b>UTC:</b> %s", timestamp.UTC().Format(time.DateTime)),
-								},
-							},
-							{
-								"buttonList": map[string]any{
-									"buttons": []any{
-										map[string]any{
-											"text": "Open",
-											"onClick": map[string]any{
-												"openLink": map[string]any{
-													"url": fmt.Sprintf("https://github.com/%s/actions/runs/%s",
-														ghJson["repository"], ghJson["run_id"]),
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-	}
-
-	return json.Marshal(jsonData)
+    return json.Marshal(jsonData)
 }
