@@ -23,85 +23,63 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestGenerateMessageBody(t *testing.T) {
+func TestgenerateMessageBody(t *testing.T) {
 	t.Parallel()
 
 	cases := []struct {
 		name            string
-		ghJson          map[string]any
-		jobJson         map[string]any
+		ghJson          map[string]interface{}
+		jobJson         map[string]interface{}
 		timestamp       time.Time
 		location        time.Location
-		wantMessageBody map[string]any
+		wantMessageBody map[string]interface{}
 	}{
 		{
 			name: "test_success_workflow",
-			ghJson: map[string]any{
+			ghJson: map[string]interface{}{
 				"workflow":         "test-workflow",
 				"ref":              "test-ref",
 				"triggering_actor": "test-triggered_actor",
 				"repository":       "test-repository",
-				"run_id":           "test-run-id",
+				"pull_request_title": "Test Pull Request",
+				"pull_request_author": "test-author",
+				"pull_request_number": "123",
 			},
-			jobJson: map[string]any{
+			jobJson: map[string]interface{}{
 				"status": "success",
 			},
 			timestamp: time.Date(2023, time.April, 25, 17, 44, 57, 0, time.UTC),
-			wantMessageBody: map[string]any{
-				"cardsV2": map[string]any{
+			wantMessageBody: map[string]interface{}{
+				"cardsV2": map[string]interface{}{
 					"cardId": "createCardMessage",
-					"card": map[string]any{
-						"header": map[string]any{
-							"title":    fmt.Sprintf("GitHub workflow %s", "success"),
-							"subtitle": fmt.Sprintf("Workflow: <b>%s</b>", "test-workflow"),
+					"card": map[string]interface{}{
+						"header": map[string]interface{}{
+							"title":    fmt.Sprintf("Pull Request %s", "success"),
+							"subtitle": fmt.Sprintf("Repository: %s", "test-repository"),
 							"imageUrl": "https://github.githubassets.com/favicons/favicon.png",
 						},
-						"sections": []any{
-							map[string]any{
-								"collapsible":               true,
-								"uncollapsibleWidgetsCount": float64(1),
-								"widgets": []map[string]any{
-									{
-										"decoratedText": map[string]any{
-											"startIcon": map[string]any{
-												"iconUrl": "https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/quick_reference/default/48px.svg",
-											},
-											"text": fmt.Sprintf("<b>Ref:</b> %s", "test-ref"),
+						"sections": []interface{}{
+							map[string]interface{}{
+								"widgets": []interface{}{
+									map[string]interface{}{
+										"decoratedText": map[string]interface{}{
+											"text": fmt.Sprintf("<b>Title:</b> %s", "Test Pull Request"),
 										},
 									},
-									{
-										"decoratedText": map[string]any{
-											"startIcon": map[string]any{
-												"knownIcon": "PERSON",
-											},
-											"text": fmt.Sprintf("<b>Run by:</b> %s", "test-triggered_actor"),
+									map[string]interface{}{
+										"decoratedText": map[string]interface{}{
+											"text": fmt.Sprintf("<b>Author:</b> %s", "test-author"),
 										},
 									},
-									{
-										"decoratedText": map[string]any{
-											"startIcon": map[string]any{
-												"knownIcon": "CLOCK",
-											},
-											"text": fmt.Sprintf("<b>Pacific:</b> %s", time.Date(2023, time.April, 25, 17, 44, 57, 0, time.UTC).In(time.FixedZone("UTC-8", -7*60*60)).Format(time.DateTime)),
-										},
-									},
-									{
-										"decoratedText": map[string]any{
-											"startIcon": map[string]any{
-												"knownIcon": "CLOCK",
-											},
-											"text": fmt.Sprintf("<b>UTC:</b> %s", time.Date(2023, time.April, 25, 17, 44, 57, 0, time.UTC).UTC().Format(time.DateTime)),
-										},
-									},
-									{
-										"buttonList": map[string]any{
-											"buttons": []any{
-												map[string]any{
+									map[string]interface{}{
+										"buttonList": map[string]interface{}{
+											"buttons": []interface{}{
+												map[string]interface{}{
 													"text": "Open",
-													"onClick": map[string]any{
-														"openLink": map[string]any{
-															"url": fmt.Sprintf("https://github.com/%s/actions/runs/%s",
-																"test-repository", "test-run-id"),
+													"onClick": map[string]interface{}{
+														"openLink": map[string]interface{}{
+															"url": fmt.Sprintf("https://github.com/%s/pull/%s",
+																"test-repository", "123"),
 														},
 													},
 												},
@@ -117,72 +95,50 @@ func TestGenerateMessageBody(t *testing.T) {
 		},
 		{
 			name: "test_failed_workflow",
-			ghJson: map[string]any{
+			ghJson: map[string]interface{}{
 				"workflow":         "test-workflow",
 				"ref":              "test-ref",
 				"triggering_actor": "test-triggered_actor",
 				"repository":       "test-repository",
-				"run_id":           "test-run-id",
+				"pull_request_title": "Test Pull Request",
+				"pull_request_author": "test-author",
+				"pull_request_number": "123",
 			},
-			jobJson: map[string]any{
+			jobJson: map[string]interface{}{
 				"status": "xxx",
 			},
 			timestamp: time.Date(2023, time.April, 25, 17, 44, 57, 0, time.UTC),
-			wantMessageBody: map[string]any{
-				"cardsV2": map[string]any{
+			wantMessageBody: map[string]interface{}{
+				"cardsV2": map[string]interface{}{
 					"cardId": "createCardMessage",
-					"card": map[string]any{
-						"header": map[string]any{
-							"title":    fmt.Sprintf("GitHub workflow %s", "xxx"),
-							"subtitle": fmt.Sprintf("Workflow: <b>%s</b>", "test-workflow"),
+					"card": map[string]interface{}{
+						"header": map[string]interface{}{
+							"title":    fmt.Sprintf("Pull Request %s", "xxx"),
+							"subtitle": fmt.Sprintf("Repository: %s", "test-repository"),
 							"imageUrl": "https://github.githubassets.com/favicons/favicon-failure.png",
 						},
-						"sections": []any{
-							map[string]any{
-								"collapsible":               true,
-								"uncollapsibleWidgetsCount": float64(1),
-								"widgets": []map[string]any{
-									{
-										"decoratedText": map[string]any{
-											"startIcon": map[string]any{
-												"iconUrl": "https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/quick_reference/default/48px.svg",
-											},
-											"text": fmt.Sprintf("<b>Ref:</b> %s", "test-ref"),
+						"sections": []interface{}{
+							map[string]interface{}{
+								"widgets": []interface{}{
+									map[string]interface{}{
+										"decoratedText": map[string]interface{}{
+											"text": fmt.Sprintf("<b>Title:</b> %s", "Test Pull Request"),
 										},
 									},
-									{
-										"decoratedText": map[string]any{
-											"startIcon": map[string]any{
-												"knownIcon": "PERSON",
-											},
-											"text": fmt.Sprintf("<b>Run by:</b> %s", "test-triggered_actor"),
+									map[string]interface{}{
+										"decoratedText": map[string]interface{}{
+											"text": fmt.Sprintf("<b>Author:</b> %s", "test-author"),
 										},
 									},
-									{
-										"decoratedText": map[string]any{
-											"startIcon": map[string]any{
-												"knownIcon": "CLOCK",
-											},
-											"text": fmt.Sprintf("<b>Pacific:</b> %s", time.Date(2023, time.April, 25, 17, 44, 57, 0, time.UTC).In(time.FixedZone("UTC-8", -7*60*60)).Format(time.DateTime)),
-										},
-									},
-									{
-										"decoratedText": map[string]any{
-											"startIcon": map[string]any{
-												"knownIcon": "CLOCK",
-											},
-											"text": fmt.Sprintf("<b>UTC:</b> %s", time.Date(2023, time.April, 25, 17, 44, 57, 0, time.UTC).UTC().Format(time.DateTime)),
-										},
-									},
-									{
-										"buttonList": map[string]any{
-											"buttons": []any{
-												map[string]any{
+									map[string]interface{}{
+										"buttonList": map[string]interface{}{
+											"buttons": []interface{}{
+												map[string]interface{}{
 													"text": "Open",
-													"onClick": map[string]any{
-														"openLink": map[string]any{
-															"url": fmt.Sprintf("https://github.com/%s/actions/runs/%s",
-																"test-repository", "test-run-id"),
+													"onClick": map[string]interface{}{
+														"openLink": map[string]interface{}{
+															"url": fmt.Sprintf("https://github.com/%s/pull/%s",
+																"test-repository", "123"),
 														},
 													},
 												},
@@ -204,7 +160,7 @@ func TestGenerateMessageBody(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			gotMessageBody, err := generateMessageBody(tc.ghJson, tc.jobJson, tc.timestamp)
 			if err != nil {
-				t.Fatalf("failed to generate messag body %v", err)
+				t.Fatalf("failed to generate message body: %v", err)
 			}
 
 			wantMessageBodyByte, err := json.Marshal(tc.wantMessageBody)
