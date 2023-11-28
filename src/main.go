@@ -155,38 +155,48 @@ func realMain(ctx context.Context) error {
 	return rootCmd().Run(ctx, os.Args[1:]) //nolint:wrapcheck // Want passthrough
 }
 
-func generateMessageBody(ghJson map[string]any, jobJson map[string]any, timestamp time.Time) ([]byte, error) {
-    jsonData := map[string]any{
-        "cardsV2": map[string]any{
+func generateMessageBody(ghJson map[string]interface{}, jobJson map[string]interface{}, timestamp time.Time) ([]byte, error) {
+    title := fmt.Sprintf("Pull Request %v", jobJson["status"])
+
+    subtitle := fmt.Sprintf("Repository: %v", ghJson["repository"])
+
+    imageUrl := "https://github.githubassets.com/favicons/favicon.png"
+
+    decoratedText1 := fmt.Sprintf("<b>Title:</b> %v", ghJson["pull_request_title"])
+    decoratedText2 := fmt.Sprintf("<b>Author:</b> %v", ghJson["pull_request_author"])
+
+    openLinkURL := fmt.Sprintf("https://github.com/%v/pull/%v", ghJson["repository"], ghJson["pull_request_number"])
+
+    jsonData := map[string]interface{}{
+        "cardsV2": map[string]interface{}{
             "cardId": "createCardMessage",
-            "card": map[string]any{
-                "header": map[string]any{
-                    "title":    fmt.Sprintf("Pull Request %s", jobJson["status"]),
-                    "subtitle": fmt.Sprintf("Repository: %s", ghJson["repository"]),
-                    "imageUrl": "https://github.githubassets.com/favicons/favicon.png",
+            "card": map[string]interface{}{
+                "header": map[string]interface{}{
+                    "title":    title,
+                    "subtitle": subtitle,
+                    "imageUrl": imageUrl,
                 },
-                "sections": []any{
-                    map[string]any{
-                        "widgets": []map[string]any{
-                            {
-                                "decoratedText": map[string]any{
-                                    "text": fmt.Sprintf("<b>Title:</b> %s", ghJson["pull_request_title"]),
+                "sections": []interface{}{
+                    map[string]interface{}{
+                        "widgets": []interface{}{
+                            map[string]interface{}{
+                                "decoratedText": map[string]interface{}{
+                                    "text": decoratedText1,
                                 },
                             },
-                            {
-                                "decoratedText": map[string]any{
-                                    "text": fmt.Sprintf("<b>Author:</b> %s", ghJson["pull_request_author"]),
+                            map[string]interface{}{
+                                "decoratedText": map[string]interface{}{
+                                    "text": decoratedText2,
                                 },
                             },
-                            {
-                                "buttonList": map[string]any{
-                                    "buttons": []any{
-                                        map[string]any{
+                            map[string]interface{}{
+                                "buttonList": map[string]interface{}{
+                                    "buttons": []interface{}{
+                                        map[string]interface{}{
                                             "text": "Open",
-                                            "onClick": map[string]any{
-                                                "openLink": map[string]any{
-                                                    "url": fmt.Sprintf("https://github.com/%s/pull/%s",
-                                                        ghJson["repository"], ghJson["pull_request_number"]),
+                                            "onClick": map[string]interface{}{
+                                                "openLink": map[string]interface{}{
+                                                    "url": openLinkURL,
                                                 },
                                             },
                                         },

@@ -23,7 +23,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestgenerateMessageBody(t *testing.T) {
+func TestGenerateMessageBody(t *testing.T) {
 	t.Parallel()
 
 	cases := []struct {
@@ -37,13 +37,13 @@ func TestgenerateMessageBody(t *testing.T) {
 		{
 			name: "test_success_workflow",
 			ghJson: map[string]interface{}{
-				"workflow":         "test-workflow",
-				"ref":              "test-ref",
-				"triggering_actor": "test-triggered_actor",
-				"repository":       "test-repository",
-				"pull_request_title": "Test Pull Request",
-				"pull_request_author": "test-author",
-				"pull_request_number": "123",
+				"workflow":              "test-workflow",
+				"ref":                   "test-ref",
+				"triggering_actor":      "test-triggered_actor",
+				"repository":            "test-repository",
+				"pull_request_title":    "Test Pull Request",
+				"pull_request_author":   "test-author",
+				"pull_request_number":   "123",
 			},
 			jobJson: map[string]interface{}{
 				"status": "success",
@@ -96,13 +96,13 @@ func TestgenerateMessageBody(t *testing.T) {
 		{
 			name: "test_failed_workflow",
 			ghJson: map[string]interface{}{
-				"workflow":         "test-workflow",
-				"ref":              "test-ref",
-				"triggering_actor": "test-triggered_actor",
-				"repository":       "test-repository",
-				"pull_request_title": "Test Pull Request",
-				"pull_request_author": "test-author",
-				"pull_request_number": "123",
+				"workflow":              "test-workflow",
+				"ref":                   "test-ref",
+				"triggering_actor":      "test-triggered_actor",
+				"repository":            "test-repository",
+				"pull_request_title":    "Test Pull Request",
+				"pull_request_author":   "test-author",
+				"pull_request_number":   "123",
 			},
 			jobJson: map[string]interface{}{
 				"status": "xxx",
